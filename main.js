@@ -16,7 +16,6 @@ var boxPos={};
 boxPos.x = Math.floor(Math.random()*39)*20
 boxPos.y = Math.floor(Math.random()*25)*20
 
-
 function start(){
     fpsInterval = 500;
     then = Date.now();
