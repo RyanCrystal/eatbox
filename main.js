@@ -3,7 +3,7 @@ ctx = canvas.getContext('2d');
 
 canvas.width = 800;
 canvas.height = 500;
-var pause;
+
 var keys = [];
 var Xarray = [20,40,60,80,100,120];
 var Yarray = [20,20,20,20,20,20];
@@ -12,6 +12,8 @@ var fpsInterval;
 var direction = 'right';
 var newBoxColor = 'blue';
 var hitBoundary = false;
+var directions =[];
+directions.push(direction);
 var boxPos={};
 boxPos.x = Math.floor(Math.random()*39)*20
 boxPos.y = Math.floor(Math.random()*25)*20
@@ -20,12 +22,24 @@ function start(){
     fpsInterval = 500;
     then = Date.now();
     startTime = then;
+    document.querySelector('.try').addEventListener('click', function(){
+         Xarray = [20,40,60,80,100,120];
+         Yarray = [20,20,20,20,20,20];
+         directions = ['right'];
+         direction = 'right';
+         boxPos.x = Math.floor(Math.random()*39)*20
+        boxPos.y = Math.floor(Math.random()*25)*20
+        hitBoundary =false
+
+    })
     move();
 }
 
 function move(){
     requestAnimationFrame(move);
     if(!hitBoundary){
+        document.querySelector('.try').classList.remove('active');
+
         moveDirection(Xarray,Yarray,direction);
         while(hasConflict()){
             boxPos.x = Math.floor(Math.random()*39)*20
@@ -33,22 +47,34 @@ function move(){
         }
         createNewBox(boxPos)
         if(keys[37] ){
-            if(direction!='right')
-            direction = 'left';
+            if(direction!='right'){
+                direction = 'left'; 
+                directions.push(direction)
+            }
+
         }
         if(keys[38] ){
-            if(direction!='down')
-            direction = 'up';
+            if(direction!='down'){
+                direction = 'up';  
+                directions.push(direction)
+            }
+
         }
         if(keys[39] ){
-            if(direction!='left')
-            direction = 'right';
+            if(direction!='left'){
+                direction = 'right'; 
+                directions.push(direction)
+            }
+
         }
         if(keys[40] ){
-            if(direction!='up')
-            direction = 'down';
+            if(direction!='up'){
+              direction = 'down';  
+              directions.push(direction)
+            }
+            
         }
-        console.log(direction);
+        // console.log(directions);
         
         now = Date.now();
         elapsed = now - then;
@@ -57,13 +83,11 @@ function move(){
             then = now ;
             checkReachBoundary();
             // checkSelfConfict();
-
-            switch (direction) {
-    
+            if(directions.length>2)
+            direction = directions[1];
+            switch (direction) { 
                 case 'left':
-                    if(Xarray[Xarray.length-1]-20<0 ||checkSelfConfict(direction) ){
-                        console.log(checkSelfConfict(direction) );
-                        
+                    if(Xarray[Xarray.length-1]-20<0 ||checkSelfConfict(direction) ){                        
                         hitBoundary = true;
                     }else{
                         Xarray.push(Xarray[Xarray.length-1]-20);
@@ -85,7 +109,6 @@ function move(){
                         Xarray.push(Xarray[Xarray.length-1]+20);
                         Yarray.push(Yarray[Yarray.length-1]);
                     }
-                    // console.log(Xarray,Yarray)
                     break;
                 case 'down':
                     if(Yarray[Yarray.length-1]+20==500 || checkSelfConfict(direction)){
@@ -98,10 +121,11 @@ function move(){
                 default:
                     break;
             }
+            
+            if(directions.length>2){
+                directions =[directions[1]];
+            }
 
-
-            // console.log(Xarray,Yarray);
-            // console.log(boxPos);
             if(Xarray[Xarray.length-1] == boxPos.x  && Yarray[Yarray.length-1] == boxPos.y ){
                 newBoxColor = 'blue';
                 boxPos.x = Math.floor(Math.random()*39)*20
@@ -114,6 +138,7 @@ function move(){
                 console.log('cross')
     
             }else if(!hitBoundary){
+               
                 console.log('hit')
                 Xarray.shift();
                 Yarray.shift();
@@ -121,8 +146,13 @@ function move(){
         }
     
     }else{
-        alert('game over')
-        
+        ctx.fillStyle = 'rgba(255, 255, 255,0.1)';
+        ctx.fillRect(0,0,800,500);
+        ctx.font = '25px serif';
+        ctx.fillStyle = 'green';
+        ctx.fillText('Game over!',350, 220);
+        hitBoundary = true;
+        document.querySelector('.try').classList.add('active');
     }
 
 }
@@ -182,7 +212,7 @@ function checkSelfConfict(direction){
     switch (direction) {
         case 'up':
             for(var i=0 ;i<Xarray.length;i++){
-               if(Yarray.slice().splice(0,1)[i] == Yarray[Yarray.length-1]-20 && Xarray.slice().splice(1,Xarray.length-1)[i] == Xarray[Xarray.length-1]){
+               if(Yarray.slice().splice(1,Xarray.length-1)[i] == Yarray[Yarray.length-1]-20 && Xarray.slice().splice(1,Xarray.length-1)[i] == Xarray[Xarray.length-1]){
                    return true;
                } 
             }
@@ -220,10 +250,10 @@ start();
 
 
 document.body.addEventListener("keydown", function (e) {
-    if(e.keyCode == 32)
-    {
-        pause =!pause;
-    }
+    // if(e.keyCode == 32)
+    // {
+    //     pause =!pause;
+    // }
         keys[e.keyCode] = true;
     });
 
